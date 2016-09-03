@@ -74,6 +74,12 @@ employees <- data.frame(fname,syear,byear,salary)
 
 View(employees)
 
+employees$syear
+
+employees$syear - employees$byear
+
+employees$sage <- employees$syear - employees$byear
+
 names(employees)
 
 head(employees)
@@ -142,8 +148,7 @@ head(pensions)
 pensions <- employees %>% mutate(pension=salary*(2016-byear)/100*(2016-syear)/100)
 head(pensions)
 
-pensions <- employees %>% mutate(pension=ifelse(2016-byear>=60,
-                                                salary*(2016-byear)/100*(2016-syear)/100,0))
+pensions <- employees %>% mutate(pension=ifelse(2016-byear>=60,salary*(2016-byear)/100*(2016-syear)/100,0))
 head(pensions)
 
 
