@@ -1,10 +1,16 @@
-#Script for Lab 2, 9.22.16
+#History 90.01 | QSS 30.05
+#9.22.16
 
-#Invoke packages
+#Invoke packages: we will need dplyr, readr, and tidyr
+#Remember to install any packages you have not used previously
 library(dplyr)
 library(readr)
+library(tidyr)
 
-#Read in IPUMS data
+#READING IN IPUMS DATA---------------------------------------------------------
+
+#The following code assumes your data file is titled "9_22.csv"
+#and is located in a folder titled "data" within your project folder
 a <- read_csv('./data/9_22.csv')
 
 #Look at the top of the dataset
@@ -12,28 +18,45 @@ head(a)
 #Look at the bottom of the dataset
 tail(a)
 
-#Factor SEX
-b <- a %>% mutate(SEXF=factor(SEX,labels=c('male','female')))
+#RECODING VARIABLES----------------------------------------------------------------
+
+#For variables like STATEFIP, SEX, RACE, and RACED,
+#we want to have the name of the value (e.g. "New Hampshire")
+#rather than a numeric code so we don't have to keep looking
+#up the codes in the codebook. We can do this by turning 
+#these numeric variables into either character variables or
+#factor variables. Let's look at the difference:
+
+#In a character variable, the value R stores is the character string.
+#Character variable for SEX
+b <- a %>% mutate(SEXC=ifelse(SEX==1,'male','female'))
+#Alternatively
+b <- a %>% mutate(SEXC=ifelse(SEX==2,'female','male'))
 head(b)
 
+#In a factor variable, R stores a numeric value and a set of
+#strings that correspond to the numeric values, just like a codebook.
+#Factor SEX
+c <- b %>% mutate(SEXF=factor(SEX,labels=c('male','female')))
+head(b)
+#The factor function takes two arguments: the variable that is 
+#being factored and a vector of value labels, in numeric order.
+
 #Factor RACE
-c <- b %>% mutate(RACEF=factor(RACE,labels=c('white','black','American Indian or Alaska Native',
+d <- c %>% mutate(RACEF=factor(RACE,labels=c('white','black','American Indian or Alaska Native',
                                              'Chinese','Japanese','Other Asian or Pacific Islander',
                                              'other','two races','three or more races')))
+#What is wrong with this code?
+#During the years represented by our dataset, not all of these values are used.
+#We need to figure out which values are used and limit the label vector to those values.
 
 #Determine which RACE values are present in the dataset
-table(b$RACE)
+table(c$RACE)
 
-#Factor RACE
-c <- b %>% mutate(RACEF=factor(RACE,labels=c('white','black','American Indian or Alaska Native',
+#Factor RACE using the correct value labels
+d <- c %>% mutate(RACEF=factor(RACE,labels=c('white','black','American Indian or Alaska Native',
                                              'Chinese','Japanese','Other Asian or Pacific Islander',
                                              'other')))
-
-#Character variable for SEX
-d <- c %>% mutate(SEXC=ifelse(SEX==1,'male','female'))
-#Alternatively
-d <- c %>% mutate(SEXC=ifelse(SEX==2,'female','male'))
-head(d)
 
 #Character variable for RACE
 e <- d %>% mutate(RACEC=ifelse(RACE==1,'white',
@@ -44,12 +67,17 @@ e <- d %>% mutate(RACEC=ifelse(RACE==1,'white',
                         ifelse(RACE==6,'Other Asian or Pacific Islander','other')))))))
 head(e)
 
-#Read in crosswalk for statefip
+#What do we do if a variable has a LOT of different values, like STATEFIP or RACED?
+#We use the codebook to make a crosswalk.
+
+#Read in crosswalk for statefip, creating a dataframe titled "states"
 states <- read_csv('./data/statefip.csv')
 
-#Add state names to dataframe
+#Add state names to dataframe with the left_join function
 f <- left_join(e,states,by='STATEFIP')
 head(f)
+
+#AGGREGATING DATA---------------------------------------------------------------------
 
 #Use group_by() and summarise() to determine population by year
 g <- f %>% group_by(YEAR) %>% summarise(NUMBER=sum(PERWT))
@@ -67,6 +95,7 @@ h
 i <- f %>% group_by(SEXF,YEAR) %>% summarise(NUMBER=sum(PERWT))
 i
 
+#DATA TABLES FOR DOCUMENTS-------------------------------------------------------
 #Columns for each gender
 library(tidyr)
 j <- i %>% spread(SEXF,NUMBER)
