@@ -38,7 +38,7 @@ head(b)
 #strings that correspond to the numeric values, just like a codebook.
 #Factor SEX
 c <- b %>% mutate(SEXF=factor(SEX,labels=c('male', 'female')))
-head(b)
+head(c)
 #The factor function takes two arguments: the variable that is 
 #being factored and a vector of value labels, in numeric order.
 
@@ -58,6 +58,7 @@ table(c$RACE)
 d <- c %>% mutate(RACEF=factor(RACE,labels=c('white', 'black', 
                   'American Indian or Alaska Native', 'Chinese', 
                   'Japanese', 'Other Asian or Pacific Islander', 'other')))
+head(d)
 
 #Character variable for RACE
 e <- d %>% mutate(RACEC=ifelse(RACE==1,'white',
