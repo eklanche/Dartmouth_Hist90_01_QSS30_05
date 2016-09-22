@@ -74,12 +74,13 @@ head(e)
 #like STATEFIP or RACED?
 #We use the codebook to make a crosswalk.
 
-#Read in crosswalk for statefip, creating a dataframe titled "states"
-states <- read_csv('./data/statefip.csv')
+#Read in crosswalk, creating a dataframe titled "states"
+states <- read_csv('./data/states.csv', col_types = cols(STATEFIP='i'))
 
 #Add state names to dataframe with the left_join function
 f <- left_join(e,states,by='STATEFIP')
 head(f)
+tail(f)
 
 #AGGREGATING DATA---------------------------------------------------------------
 
@@ -99,9 +100,8 @@ h
 i <- f %>% group_by(SEXF, YEAR) %>% summarise(NUMBER=sum(PERWT))
 i
 
-#DATA TABLES FOR DOCUMENTS------------------------------------------------------
-#Columns for each gender
-library(tidyr)
+#EXPORTING DATA TABLES------------------------------------------------------
+#One row for each year and one column for each sex
 j <- i %>% spread(SEXF, NUMBER)
 j
 
@@ -109,26 +109,31 @@ j
 j <- h %>% spread(SEXF, NUMBER)
 j
 
+#Export to LaTex
+library(xtable)
+print(xtable(j),include.rownames=FALSE)
+
 #Export to .csv
 write_csv(j,'./data/year_sex.csv')
 
-#Population by regions
-#start with data frame f
-head(f)
-#create REGION variable
+#Starting with dataframe f, create a new REGION variable
 k <- f %>% mutate(REGION=ifelse(STATEFIP %in% c(2, 15),'Alaska_Hawaii',
                   ifelse(STATEFIP %in% c(4, 6, 8, 16, 30, 32, 35, 41, 49, 53, 56), 'West',
                   ifelse(STATEFIP %in% c(17, 18, 19, 20, 26, 27, 29, 31, 38, 39, 46, 55), 'Midwest',
                   ifelse(STATEFIP %in% c(9, 23, 25, 33, 34, 36, 42, 44, 50),'Northeast','South')))))
 head(k)
+tail(k)
+
 #calculate population of each region at each census
 l <- k %>% group_by(YEAR, REGION) %>% summarise(NUMBER = sum(PERWT))
 l
-#spread data frame: row for each year, column for each region
+#spread data frame: 
+#row for each year, column for each region
 m <- l %>% spread(REGION, NUMBER)
 m
 #alternatively
-m <- k %>% group_by(YEAR, REGION) %>% summarise(NUMBER = sum(PERWT)) %>% 
+m <- k %>% group_by(YEAR, REGION) %>% 
+  summarise(NUMBER = sum(PERWT)) %>% 
   spread(REGION, NUMBER)
 m
 
