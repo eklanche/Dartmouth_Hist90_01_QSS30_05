@@ -21,12 +21,12 @@ b <- a %>% mutate(REGION=factor(
                       ifelse(IND1950<246, 2,
                       ifelse(IND1950==246 | IND1950==976,4,
                       ifelse(IND1950>700,7,
-                      ifelse(IND1950>600,6,
-                      ifelse(IND1950>500,5,3)))))),
+                      ifelse(IND1950>600,5,
+                      ifelse(IND1950>500,6,3)))))),
                       labels=c('none','agricultural/extractive','manufacturing',
-                               'construction or general labor',
-                               'transporation/communication/utilities',
-                               'trade','service')),
+                               'construction or general labor','trade',
+                               'transportation/communication/utilities',
+                               'service')),
                   SEXC=ifelse(SEX==1,'male','female'))
 
 c <- b %>% group_by(YEAR,IND,REGION,SEXC) %>% summarise(NUMBER=sum(PERWT))
@@ -34,21 +34,21 @@ c <- b %>% group_by(YEAR,IND,REGION,SEXC) %>% summarise(NUMBER=sum(PERWT))
 png('ind_region.png',height=500,width=1000)
 ggplot(data=c,aes(x=YEAR,y=NUMBER,fill=IND)) + 
   geom_bar(stat='identity',position='fill') + 
-  labs(x='Year',y='Percent',fill='Occupation',title='Occupation by Sex, Region, and Year, 1870-1920') +
+  labs(x='Year',y='Percent',fill='Industry',title='Industry for Persons Aged 15-65 by Sex, Region, and Year, 1870-1920') +
   scale_y_continuous(labels=scales::percent) +
   scale_x_continuous(breaks=c(1870,1900,1920)) +
-  scale_fill_brewer(palette='Set1',guide=guide_legend(reverse=TRUE)) +
+  scale_fill_brewer(palette='Set1') +
   facet_grid(SEXC~.~REGION) +
-  theme_bw(base_size = 22)
+  theme_bw(base_size = 18) + theme(legend.position='bottom')
 dev.off()
 
-png('region_sex.png',height=1000,width=1000)
+png('region_sex.png',height=500,width=1000)
 ggplot(data=arrange(c,SEXC),aes(x=YEAR,y=NUMBER,fill=SEXC)) +
   geom_bar(stat='identity') +
-  labs(x='Year',y='Number',fill='Sex',title='Population by Region, Year, and Sex, 1870-1920') +
+  labs(x='Year',y='Number',fill='Sex',title='Population Aged 15-65 by Region, Year, and Sex, 1870-1920') +
   scale_y_continuous(labels=scales::comma) +
   scale_x_continuous(breaks=c(1870,1900,1920)) +
   scale_fill_brewer(palette='Set2',guide=guide_legend(reverse=TRUE)) +
   facet_wrap(~REGION,ncol=2,scales='free_y') +
-  theme_bw(base_size = 24)
+  theme_bw(base_size = 18)
 dev.off()
