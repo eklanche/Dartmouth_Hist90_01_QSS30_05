@@ -34,7 +34,7 @@ c <- b %>% group_by(YEAR,IND,REGION,SEXC) %>% summarise(NUMBER=sum(PERWT))
 png('ind_region.png',height=500,width=1000)
 ggplot(data=c,aes(x=YEAR,y=NUMBER,fill=IND)) + 
   geom_bar(stat='identity',position='fill') + 
-  labs(x='Year',y='Percent',fill='Industry',title='4. Industry for Persons Aged 15-65 by Sex, Region, and Year, 1870-1920') +
+  labs(x='Year',y='Percent',fill='Industry',title='3. Industry for Persons Aged 15-65 by Sex, Region, and Year, 1870-1920') +
   scale_y_continuous(labels=scales::percent) +
   scale_x_continuous(breaks=c(1870,1900,1920)) +
   scale_fill_brewer(palette='Set1') +
