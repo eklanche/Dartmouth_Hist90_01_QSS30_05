@@ -69,7 +69,16 @@ f1 <- e %>% group_by(YEAR, Sex, Region) %>% summarise(Number=sum(PERWT))
 #For the second one, I want to group by YEAR, Sex, Region, and Industry.
 f2 <- e %>% group_by(YEAR, Sex, Region, Industry) %>% summarise(Number=sum(PERWT))
 
-png('ind_region.png',height=500,width=1000)
+#Graphing
+ggplot(data=f1,aes(x=YEAR,y=Number,fill=Sex)) +
+  geom_bar(stat='identity') +
+  labs(x='Year',y='Population',fill='Sex',title='1. Population Aged 15-65 by Region, Year, and Sex, 1870-1920') +
+  scale_y_continuous(labels=scales::comma) +
+  scale_x_continuous(breaks=c(1870,1900,1920)) +
+  scale_fill_brewer(palette='Set2',guide=guide_legend(reverse=TRUE)) +
+  facet_wrap(~REGION)
+
+
 ggplot(data=c,aes(x=YEAR,y=NUMBER,fill=IND)) + 
   geom_bar(stat='identity',position='fill') + 
   labs(x='Year',y='Percent',fill='Industry',title='3. Industry for Persons Aged 15-65 by Sex, Region, and Year, 1870-1920') +
